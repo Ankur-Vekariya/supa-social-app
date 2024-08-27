@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "supa-social-app",
-    "slug": "supa-social-app",
+    "slug": "supa-social",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -19,7 +19,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.ankur_vekariya.supasocial"
     },
     "web": {
       "bundler": "metro",
@@ -31,6 +32,15 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "112d3feb-5eea-4b09-b4fd-299a9bb157b1"
+      }
+    },
+    "owner": "ankur_vekariya"
   }
 }
