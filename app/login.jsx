@@ -9,17 +9,29 @@ import { theme } from "../constants/theme";
 import Input from "../components/Input";
 import Button from "../components/Button";
 import { router } from "expo-router";
+import { supabase } from "../lib/supabase";
 
 const login = () => {
   const emailRef = useRef("");
   const passwordRef = useRef("");
   const [loading, setLoading] = useState(false);
 
-  const onSubmit = () => {
+  const onSubmit = async () => {
     if (!emailRef.current || !passwordRef.current) {
-      Alert.alert('Login',"Please fill all the fields")
-      return
+      Alert.alert("Login", "Please fill all the fields");
+      return;
     }
+    setLoading(true);
+    let email = emailRef.current.trim();
+    let password = passwordRef.current.trim();
+    const { error } = await supabase.auth.signInWithPassword({
+      email: email,
+      password: password,
+    });
+    console.log(error);
+
+    if (error) Alert.alert(error.message);
+    setLoading(false);
   };
 
   return (

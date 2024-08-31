@@ -9,19 +9,56 @@ import { theme } from "../constants/theme";
 import Input from "../components/Input";
 import Button from "../components/Button";
 import { router } from "expo-router";
+import { supabase } from "../lib/supabase";
 
 const SignUp = () => {
+
+//   create fu nction public.handle_new_user()
+// returns trigger
+// language plpgsql
+// security definer set search_path = public
+// as $$
+// begin 
+//   insert into public.users (id, name)
+//   values(new.id,new.raw_user_meta_data->>'name');
+//   return new;
+// end;
+// $$;
+
+// create trigger createAuthUser
+//  after insert on auth.users
+//  for each row execute procedure public.handle_new_user();
+
   const emailRef = useRef("");
   const nameRef = useRef("");
   const passwordRef = useRef("");
 
   const [loading, setLoading] = useState(false);
 
-  const onSubmit = () => {
+  const onSubmit = async () => {
     if (!nameRef.current || !emailRef.current || !passwordRef.current) {
-      Alert.alert('Sign Up',"Please fill all the fields")
-      return
+      Alert.alert("Sign Up", "Please fill all the fields");
+      return;
     }
+    setLoading(true);
+    let name = nameRef.current.trim();
+    let email = emailRef.current.trim();
+    let password = passwordRef.current.trim();
+
+    const {
+      data: { session },
+      error,
+    } = await supabase.auth.signUp({
+      email,
+      password,
+      options:{
+        data:{
+          name
+        }
+      }
+    });
+    if (error) Alert.alert(error.message);
+    setLoading(false);
   };
 
   return (
