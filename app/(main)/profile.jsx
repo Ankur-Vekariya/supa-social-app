@@ -90,6 +90,10 @@ const UserHeader = ({ user, router, handleLogout }) => {
               <Icon name="mail" size={20} color={theme.colors.textLight} />
               <Text style={styles.infoText}>{user && user?.email}</Text>
             </View>
+            <View style={styles.info}>
+              <Icon name="call" size={20} color={theme.colors.textLight} />
+              <Text style={styles.infoText}>{user && user?.phone}</Text>
+            </View>
             <Text style={styles.userName}>{user && user?.name}</Text>
           </View>
         </View>

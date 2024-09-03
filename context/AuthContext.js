@@ -6,15 +6,15 @@ export const AuthProvider = ({ children }) => {
   const setAuth = (authUser) => {
     setUser(authUser);
   };
-  const setUserDate = (userData) => {
-    setUser({ ...userData });
+  const setUserData = (userData) => {
+    setUser({ ...userData, email: uesr?.email });
   };
 
   return (
-    <AuthContext.Provider value={{ user, setAuth, setUserDate }}>
+    <AuthContext.Provider value={{ user, setAuth, setUserData }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
-export const useAuth = () => useContext(AuthContext)
+export const useAuth = () => useContext(AuthContext);
