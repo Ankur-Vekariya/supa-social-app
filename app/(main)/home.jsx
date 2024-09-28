@@ -1,5 +1,12 @@
-import { Alert, Pressable, StyleSheet, Text, View } from "react-native";
-import React from "react";
+import {
+  Alert,
+  FlatList,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
+import React, { useEffect, useState } from "react";
 import ScreenWrapper from "../../components/ScreenWrapper";
 import Button from "../../components/Button";
 import { useAuth } from "../../context/AuthContext";
@@ -9,19 +16,53 @@ import { theme } from "../../constants/theme";
 import Icon from "../../assets/icons";
 import { router } from "expo-router";
 import Avatar from "../../components/Avatar";
+import { fetchPost } from "../../services/postService";
+import PostCard from "../../components/PostCard";
+import Loading from "../../components/Loading";
 
+var limit = 10;
 const Home = () => {
   const { setAuth, user } = useAuth();
-  const signOut = () => {
-    setAuth(null);
-    const { error } = supabase.auth.signOut();
-    if (error) {
-      Alert.alert("Sign Out", error.message);
+
+  const [post, setPost] = useState([]);
+
+  const handlePostEvent = async (payload) => {
+    console.log("payload========", payload);
+    if (payload.eventType === "INSERT" && payload?.new?.id) {
+      let newPost = { ...payload.new };
+      let user = await getUserData(newPost.userId);
+      newPost.user = res.success ? res.data : {};
+      setPost((prevPost) => [newPost, ...prevPost]);
     }
   };
+
+  useEffect(() => {
+    let postChannel = supabase
+      .channel("posts")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "posts" },
+        handlePostEvent
+      )
+      .subscribe();
+    getPost();
+    return () => {
+      supabase.removeChannel(postChannel);
+    };
+  }, []);
+
+  const getPost = async () => {
+    limit += 10;
+    let res = await fetchPost();
+    if (res.success) {
+      setPost(res.data);
+    }
+    // console.log("post----------", res);
+    // console.log("post----------", res.data[0].user);
+  };
+
   return (
     <ScreenWrapper bg="white">
-      {/* <Text>Home</Text> */}
       <View style={styles.container}>
         <View style={styles.header}>
           <Text style={styles.title}>Supa Social</Text>
@@ -53,8 +94,24 @@ const Home = () => {
             </Pressable>
           </View>
         </View>
+        {/* post */}
+        <FlatList
+          data={post}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.listStyle}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={({ item }) => {
+            return <PostCard item={item} currentUser={user} />;
+          }}
+          ListFooterComponent={() => {
+            return (
+              <View style={{ marginVertical: post.length === 0 ? 200 : 30 }}>
+                <Loading />
+              </View>
+            );
+          }}
+        />
       </View>
-      <Button title="Log out" onPress={signOut} />
     </ScreenWrapper>
   );
 };
@@ -82,5 +139,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     gap: 20,
+  },
+  listStyle: {
+    paddingTop: 20,
+    paddingHorizontal: wp(4),
   },
 });

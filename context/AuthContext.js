@@ -7,7 +7,7 @@ export const AuthProvider = ({ children }) => {
     setUser(authUser);
   };
   const setUserData = (userData) => {
-    setUser({ ...userData, email: uesr?.email });
+    setUser({ ...userData, email: user?.email });
   };
 
   return (
